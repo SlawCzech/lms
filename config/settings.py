@@ -11,9 +11,17 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
 from pathlib import Path
+import os
+import dj_database_url
+import environ
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+env = environ.Env()
+environ.Env.read_env(env_file=os.path.join(BASE_DIR, 'env', '.env'))
+# print(env('DATABASE_URL'))
+
 
 
 # Quick-start development settings - unsuitable for production
@@ -81,6 +89,15 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
+DATABASE_URL = env('DATABASE_URL')
+db_from_env = dj_database_url.config(
+    default=DATABASE_URL,
+    conn_max_age=500,
+    ssl_require=False
+)
+
+DATABASES['default'].update(db_from_env)
 
 
 # Password validation
