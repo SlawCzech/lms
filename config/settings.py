@@ -16,6 +16,8 @@ import dj_database_url
 import environ
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
+import contact.apps
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 env = environ.Env()
@@ -49,6 +51,7 @@ INSTALLED_APPS = [
     "crispy_bootstrap5",
 
     'user.apps.UserConfig',
+    'contact.apps.ContactConfig',
 ]
 
 MIDDLEWARE = [
@@ -146,14 +149,18 @@ STATICFILES_DIRS = [
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-LOGGING = {
-    "version": 1,
-    "handlers": {"console": {"class": "logging.StreamHandler"}},
-    "loggers": {"django.db.backends": {"level": "DEBUG"}},
-    "root": {"handlers": ["console"]},
-}
+
+# LOGGING = {
+#     "version": 1,
+#     "handlers": {"console": {"class": "logging.StreamHandler"}},
+#     "loggers": {"django.db.backends": {"level": "DEBUG"}},
+#     "root": {"handlers": ["console"]},
+# }
 
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 
 CRISPY_TEMPLATE_PACK = "bootstrap5"
+
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+

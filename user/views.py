@@ -11,7 +11,6 @@ def registration_view(request):
     if request.method =='POST':
         form = forms.RegistrationForm(request.POST)
         if form.is_valid():
-
             form.save()
             return redirect(reverse_lazy('user:home'))
     else:
