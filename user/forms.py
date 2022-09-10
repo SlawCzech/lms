@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib.auth import get_user_model
+from django.contrib.auth.forms import AuthenticationForm
 from django.core.exceptions import ValidationError
 
 from . import models
@@ -7,25 +8,18 @@ from . import models
 
 class RegistrationForm(forms.ModelForm):
     password = forms.CharField(label="Provide secret password", widget=forms.PasswordInput
-    (attrs={"placeholder": "Daj hasło!"})
+    (attrs={"placeholder": "Podaj hasło!"})
     ) # modyfikacja pola html!!!
 
     password_confirmation = forms.CharField(
         label = "Confirm password",
-        widget = forms.PasswordInput(attrs={"placeholder": "Przestań prześladować hasło"})
+        widget = forms.PasswordInput(attrs={"placeholder": "Potwierdź hasło"})
     )
 
     class Meta:
         model = get_user_model()
-        fields = ("first_name", "last_name", "username", "email", "password", "is_superuser")
+        fields = ("email", "fullname", "is_instructor", "password")
 
-    def clean_login(self): # walidacja logina!!
-        login = self.cleaned_data.get("login", None)
-
-        if login is not None and len(login) <= 3:
-            raise ValidationError("Something went wrong")
-
-        return login
 
     def clean_password(self):
         special_signs = "!@#$%^&*"
@@ -53,9 +47,17 @@ class RegistrationForm(forms.ModelForm):
     def save(self, commit=True):
         user = super().save(commit=False)
         user.set_password(self.cleaned_data.get('password'))
-        user.is_staff = True
+        user.is_active = True
 
         if commit:
             user.save()
 
         return user
+
+class LoginForm(AuthenticationForm):
+    username = forms.EmailField(label='Email', widget=forms.TextInput(attrs={
+        'name': 'username',
+        'placeholder': 'Email'
+    }))
+    class Meta:
+        fields = ('username', 'password')
