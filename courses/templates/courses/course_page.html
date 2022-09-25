@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block container %}
+    <div class="row">
+        <div class="col-md-3 col-md-offset-2">
+            <img src="{{ course.course_image.url }}" alt="{{ course.title }}" class="img-thumbnail">
+        </div>
+        <div class="col-md-9">
+            <h1>{{ course.title }}</h1>
+            <p><i>Created by: {{ course.owner.fullname }} at {{ course.created|date }}</i></p>
+            <p class="lead my-3">{{ course.overview }}</p>
+            {% if user.is_authenticated %}
+                {% if user.id == course.owner.id %}
+                    <p class="lead mb-0 btn-group-sm">
+                        <a href="{% url 'courses:course-edit' slug=course.slug %}" class="btn btn-danger">Edit course</a>
+                        <a href="{% url 'courses:course-delete' slug=course.slug %}" class="btn btn-danger">Delete course</a>
+                        <a href="" class="btn btn-danger">Edit modules</a>
+                    </p>
+                {% else %}
+                    <p class="lead mb-0 btn-group-sm">
+                        {% if not user in course.students.all %}
+                            <form action="" method="post">
+                                {% csrf_token %}
+                                <input type="submit" class="btn btn-danger float-end ml-2" value="Take this course">
+                            </form>
+                        {% else %}
+                            <a href="" class="btn btn-success">View course</a>
+                        {% endif %}
+                    </p>
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="row mt-2">
+        <div class="col">
+            {% if course.modules.count %}
+                <h2>{{ course.title }}`s Modules</h2>
+                <hr>
+                <ul class="nav nav-pills flex-column">
+                    <div class="accordion" id="accordionExample">
+                        {% for module in course.modules.all %}
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="headingOne">
+                                    <button class="accordion-button {% if not forloop.first %}collapsed{% endif %}" type="button" data-bs-toggle="collapse"
+                                            data-bs-target="#collapse{{ module.order }}" aria-expanded="{% if forloop.first %}true {% else %} false{% endif %}"
+                                            aria-controls="collapseOne">
+                                        {{ module.title }}
+                                    </button>
+                                </h2>
+                                <div id="collapse{{ module.order }}" class="accordion-collapse collapse {% if forloop.first %}show{% endif %}"
+                                     aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+                                    <div class="accordion-body">
+                                        {{ module.description }}
+                                        <hr>
+                                        {% if user.is_authenticated %}
+                                            {% for content in module.contents.all %}
+                                                {{ content.item.render }}
+                                            {% endfor %}
+
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </ul>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
